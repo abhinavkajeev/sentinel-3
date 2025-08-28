@@ -279,7 +279,7 @@ const LandingPage = ({ onLogin }) => {
                   />
                 </div>
                 <div>
-                  <label className="block text-gray-400 mb-2 text-sm flex items-center space-x-2">
+                  <label className="text-gray-400 mb-2 text-sm flex items-center space-x-2">
                     <span>Phone Number</span>
                   </label>
                   <input
@@ -292,7 +292,7 @@ const LandingPage = ({ onLogin }) => {
                   />
                 </div>
                 <div>
-                  <label className="block text-gray-400 mb-2 text-sm flex items-center space-x-2">
+                  <label className="text-gray-400 mb-2 text-sm flex items-center space-x-2">
                     <span>Email</span>
                   </label>
                   <input
@@ -305,7 +305,7 @@ const LandingPage = ({ onLogin }) => {
                   />
                 </div>
                 <div>
-                  <label className="block text-gray-400 mb-2 text-sm flex items-center space-x-2">
+                  <label className="text-gray-400 mb-2 text-sm flex items-center space-x-2">
                     <span>Password</span>
                   </label>
                   <input
@@ -723,7 +723,7 @@ const LandingPage = ({ onLogin }) => {
               
               <div className="space-y-4">
                 <div>
-                  <label className="block text-gray-400 mb-2 text-sm flex items-center space-x-2">
+                  <label className="text-gray-400 mb-2 text-sm flex items-center space-x-2">
                     <User size={16} />
                     <span>Username</span>
                   </label>
@@ -738,7 +738,7 @@ const LandingPage = ({ onLogin }) => {
                 </div>
                 
                 <div>
-                  <label className="block text-gray-400 mb-2 text-sm flex items-center space-x-2">
+                  <label className=" text-gray-400 mb-2 text-sm flex items-center space-x-2">
                     <Lock size={16} />
                     <span>Password</span>
                   </label>
