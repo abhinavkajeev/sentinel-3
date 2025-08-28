@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext.jsx';
+import api from '../services/api.js';
 import { 
   Search, 
   LayoutGrid, 
@@ -14,28 +16,101 @@ import {
   AlertTriangle,
   ChevronsLeft,
   ChevronsRight,
-  Fingerprint
+  Fingerprint,
+  LogOut as LogOutIcon
 } from 'lucide-react';
 
 const Dashboard = () => {
+  const { company, logout } = useAuth();
+  const navigate = useNavigate();
+  
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [activeTab, setActiveTab] = useState('All Events');
-  
   const [isAnimating, setIsAnimating] = useState(false);
+  const [securityEvents, setSecurityEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({
+    activeCameras: 0,
+    securityAlerts: 0,
+    systemUptime: '99.98%'
+  });
 
-  const securityEvents = [
-    // I've added more items to make the content long enough to scroll
-    { id: 'EVT-7B3D9', timestamp: '3:01:12 PM', eventType: 'Entry', status: 'Verified' },
-    { id: 'DEV-A4C8E', timestamp: '2:59:45 PM', eventType: 'Attempt', status: 'Flagged' },
-    { id: 'EVT-F6A21', timestamp: '2:58:03 PM', eventType: 'Exit', status: 'Verified' },
-    { id: 'EVT-9C55B', timestamp: '2:55:19 PM', eventType: 'Entry', status: 'Verified' },
-    { id: 'EVT-E2D44', timestamp: '2:54:30 PM', eventType: 'Exit', status: 'Verified' },
-    { id: 'EVT-1F88G', timestamp: '2:52:01 PM', eventType: 'Entry', status: 'Verified' },
-    { id: 'EVT-3H22A', timestamp: '2:51:43 PM', eventType: 'Exit', status: 'Verified' },
-    { id: 'EVT-B7G19', timestamp: '2:49:11 PM', eventType: 'Entry', status: 'Verified' },
-    { id: 'DEV-K9L3P', timestamp: '2:48:50 PM', eventType: 'Attempt', status: 'Flagged' },
-    { id: 'EVT-M4N0B', timestamp: '2:47:22 PM', eventType: 'Exit', status: 'Verified' },
-  ];
+  // Check authentication
+  useEffect(() => {
+    if (!company) {
+      navigate('/login');
+      return;
+    }
+  }, [company, navigate]);
+
+  // Fetch recent sessions from backend
+  useEffect(() => {
+    const fetchSessions = async () => {
+      if (!company) return;
+      
+      try {
+        setLoading(true);
+        const response = await api.getRecentSessions(company.companyPin, 50);
+        
+        if (response.ok && response.sessions) {
+          // Transform sessions into events format
+          const events = response.sessions.map(session => {
+            const entryEvent = {
+              id: session.sessionId + '-ENTRY',
+              timestamp: new Date(session.entry?.at).toLocaleTimeString(),
+              eventType: 'Entry',
+              status: 'Verified',
+              sessionId: session.sessionId,
+              photoHash: session.entry?.photoHash,
+              ipfsUrl: session.entry?.photoUrl,
+              txHash: session.entry?.txHash,
+              blockHeight: session.entry?.blockHeight,
+              eventId: session.entry?.eventId
+            };
+            
+            const exitEvent = session.exit ? {
+              id: session.sessionId + '-EXIT',
+              timestamp: new Date(session.exit.at).toLocaleTimeString(),
+              eventType: 'Exit',
+              status: 'Verified',
+              sessionId: session.sessionId,
+              photoHash: session.exit.photoHash,
+              ipfsUrl: session.exit.photoUrl,
+              txHash: session.exit.txHash,
+              blockHeight: session.exit.blockHeight,
+              eventId: session.exit.eventId,
+              matchConfidence: session.matchConfidence
+            } : null;
+            
+            return [entryEvent, exitEvent].filter(Boolean);
+          }).flat();
+          
+          setSecurityEvents(events);
+          
+          // Update stats
+          setStats({
+            activeCameras: Math.min(48, events.length),
+            securityAlerts: events.filter(e => e.status === 'Flagged').length,
+            systemUptime: '99.98%'
+          });
+        }
+      } catch (error) {
+        console.error('Failed to fetch sessions:', error);
+        // Fallback to mock data for demo
+        setSecurityEvents([
+          { id: 'EVT-7B3D9', timestamp: '3:01:12 PM', eventType: 'Entry', status: 'Verified' },
+          { id: 'DEV-A4C8E', timestamp: '2:59:45 PM', eventType: 'Attempt', status: 'Flagged' },
+          { id: 'EVT-F6A21', timestamp: '2:58:03 PM', eventType: 'Exit', status: 'Verified' },
+          { id: 'EVT-9C55B', timestamp: '2:55:19 PM', eventType: 'Entry', status: 'Verified' },
+          { id: 'EVT-E2D44', timestamp: '2:54:30 PM', eventType: 'Exit', status: 'Verified' },
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSessions();
+  }, [company]);
   
   const filteredEvents = securityEvents.filter(event => {
     if (activeTab === 'All Events') return true;
@@ -72,7 +147,6 @@ const Dashboard = () => {
     }
   };
 
-  const navigate = useNavigate();
   return (
     // CHANGED: Set a fixed screen height and removed overflow-hidden
     <div className="flex h-screen bg-[#0A0A0A] text-gray-300 font-sans">
@@ -115,6 +189,13 @@ const Dashboard = () => {
              {isSidebarOpen ? <ChevronsLeft size={20} /> : <ChevronsRight size={20} />}
              {isSidebarOpen && <span className="font-medium">Collapse</span>}
            </button>
+           <button 
+             onClick={logout}
+             className={`flex items-center w-full space-x-3 px-4 py-3 rounded-lg hover:bg-red-500/20 text-red-400 ${!isSidebarOpen && 'justify-center'}`}
+           >
+             <LogOutIcon size={20} />
+             {isSidebarOpen && <span className="font-medium">Logout</span>}
+           </button>
         </div>
       </aside>
 
@@ -130,7 +211,11 @@ const Dashboard = () => {
         
         <div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            {[{icon: Video, title: "Active Cameras", value:"48 / 50", color:"green"}, {icon: AlertTriangle, title: "Security Alerts (24h)", value:"3", color:"yellow"}, {icon: Shield, title: "System Uptime", value:"99.98%", color:"blue"}].map(card => (
+            {[
+              {icon: Video, title: "Active Cameras", value: `${stats.activeCameras} / 50`, color: "green"}, 
+              {icon: AlertTriangle, title: "Security Alerts (24h)", value: stats.securityAlerts.toString(), color: "yellow"}, 
+              {icon: Shield, title: "System Uptime", value: stats.systemUptime, color: "blue"}
+            ].map(card => (
               <div key={card.title} className="bg-black/30 backdrop-blur-md p-6 rounded-xl border border-white/10 transition-all duration-300 hover:border-white/20 hover:shadow-lg hover:shadow-green-500/10">
                 <div className="flex items-center space-x-4">
                   <div className={`p-3 bg-${card.color}-500/10 rounded-lg`}><card.icon className={`text-${card.color}-400`} size={24}/></div>

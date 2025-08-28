@@ -14,8 +14,8 @@ export const ipfsConfigs = {
     host: 'api.pinata.cloud',
     port: 443,
     protocol: 'https',
-    auth: process.env.IPFS_AUTH, // Format: "Bearer your_jwt_token"
-    gateway: 'https://gateway.pinata.cloud/ipfs'
+    auth: process.env.PINATA_JWT, // Use the JWT token
+    gateway: process.env.GATEWAY_URL ? `https://${process.env.GATEWAY_URL}/ipfs` : 'https://gateway.pinata.cloud/ipfs'
   },
 
   // Local IPFS node

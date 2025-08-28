@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import { 
@@ -19,7 +20,8 @@ import {
   AlertTriangle
 } from 'lucide-react';
 
-const LandingPage = ({ onLogin }) => {
+const LandingPage = () => {
+  const navigate = useNavigate();
   const [showLogin, setShowLogin] = useState(false);
   const [formData, setFormData] = useState({
     username: '',
@@ -220,11 +222,11 @@ const LandingPage = ({ onLogin }) => {
 
         <div className="flex items-center space-x-6">
           <button
-            onClick={() => setShowLogin(true)}
+            onClick={() => navigate('/login')}
             className="px-6 py-2 border border-gray-400 rounded-full bg-white text-black font-semibold text-sm shadow-sm transition-all duration-200 transform hover:scale-105 hover:bg-gray-100 hover:border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400"
             type="button"
           >
-            Admin Login
+            Company Login
           </button>
           <button
             onClick={() => setShowCompanyReg(true)}
