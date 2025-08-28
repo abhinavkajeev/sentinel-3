@@ -4,6 +4,7 @@ import { useAuth } from './contexts/AuthContext.jsx';
 import LandingPage from './components/LandingPage';
 import Dashboard from './components/Dashboard';
 import CameraPage from './components/CameraPage';
+import { useState } from 'react';
 
 function AppRouter() {
   // Track company registration globally
