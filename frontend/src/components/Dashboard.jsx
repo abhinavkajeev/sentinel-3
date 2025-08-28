@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
-function Dashboard({ onBack, onCamera }) {
+function Dashboard() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -85,18 +86,20 @@ function Dashboard({ onBack, onCamera }) {
           >
             Refresh Log
           </button>
-          <button
-            onClick={onCamera}
-            className="w-full sm:w-auto px-6 py-3 rounded-xl bg-green-600 text-white font-semibold shadow-lg hover:bg-green-700 transition-all duration-300 transform hover:scale-105"
-          >
-            Open Camera
-          </button>
-          <button
-            onClick={onBack}
-            className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gray-500 text-white font-semibold shadow-lg hover:bg-gray-600 transition-all duration-300 transform hover:scale-105"
-          >
-            Back to Landing Page
-          </button>
+          <Link to="/camera">
+            <button
+              className="w-full sm:w-auto px-6 py-3 rounded-xl bg-green-600 text-white font-semibold shadow-lg hover:bg-green-700 transition-all duration-300 transform hover:scale-105"
+            >
+              Open Camera
+            </button>
+          </Link>
+          <Link to="/">
+            <button
+              className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gray-500 text-white font-semibold shadow-lg hover:bg-gray-600 transition-all duration-300 transform hover:scale-105"
+            >
+              Back to Landing Page
+            </button>
+          </Link>
         </div>
         {error && (
           <div className="bg-red-800 text-red-100 p-4 rounded-xl shadow-lg mb-6 text-center transition-all duration-300">

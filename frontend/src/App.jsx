@@ -5,22 +5,11 @@
 
 
 
-import React, { useState } from 'react';
-import LandingPage from './components/LandingPage';
-import Dashboard from './components/Dashboard';
-import CameraPage from './components/CameraPage';
+import React from 'react';
+import AppRouter from './AppRouter';
 
 function App() {
-  const [page, setPage] = useState('landing'); // 'landing' | 'dashboard' | 'camera'
-
-  if (page === 'landing') {
-    return <LandingPage onLogin={() => setPage('dashboard')} />;
-  }
-  if (page === 'camera') {
-    return <CameraPage />;
-  }
-  // dashboard
-  return <Dashboard onBack={() => setPage('landing')} onCamera={() => setPage('camera')} />;
+  return <AppRouter />;
 }
 
 export default App;

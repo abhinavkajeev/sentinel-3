@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
-import * as faceapi from 'face-api.js';
+
+import { Link } from 'react-router-dom';
 
 const CameraPage = () => {
   const videoRef = useRef(null);
@@ -131,6 +132,11 @@ const CameraPage = () => {
           </div>
         )}
       </div>
+      <Link to="/dashboard">
+        <button className="mt-8 px-6 py-3 bg-gray-700 rounded-lg hover:bg-gray-800 font-semibold text-white">
+          Back to Log
+        </button>
+      </Link>
       <p className="mt-8 text-gray-400 text-sm max-w-lg text-center">
         Note: Face detection is a placeholder. For real detection, integrate a library like <a href="https://github.com/justadudewhohacks/face-api.js/" className="underline text-blue-400" target="_blank" rel="noopener noreferrer">face-api.js</a>.
       </p>
