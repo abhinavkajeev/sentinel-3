@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { connectWallet, disconnectWallet } from '../blockchain/stacks';
 import { motion, AnimatePresence } from 'framer-motion';
 import { registerCompany } from '../services/companyService';
@@ -23,6 +24,7 @@ import {
 } from 'lucide-react';
 
 const LandingPage = ({ onLogin }) => {
+  const navigate = useNavigate();
   const [showLogin, setShowLogin] = useState(false);
   const [walletAddress, setWalletAddress] = useState("");
   const [walletConnected, setWalletConnected] = useState(false);
@@ -160,7 +162,7 @@ const LandingPage = ({ onLogin }) => {
           {/* Company Registration Button: always visible until registered */}
           {!companyRegistered ? (
             <button
-              onClick={() => setShowCompanyReg(true)}
+              onClick={() => navigate('/login?mode=register')}
               className="px-6 py-2 border border-yellow-400 rounded-full bg-yellow-300 text-black font-semibold text-sm shadow-sm transition-all duration-200 transform hover:scale-105 hover:bg-yellow-200 hover:border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-300"
               type="button"
             >
@@ -180,7 +182,7 @@ const LandingPage = ({ onLogin }) => {
           )}
           {/* Existing buttons */}
           <button
-            onClick={() => setShowLogin(true)}
+            onClick={() => navigate('/login')}
             className="px-6 py-2 border border-gray-400 rounded-full bg-white text-black font-semibold text-sm shadow-sm transition-all duration-200 transform hover:scale-105 hover:bg-gray-100 hover:border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400"
             type="button"
           >
