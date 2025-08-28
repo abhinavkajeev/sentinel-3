@@ -5,7 +5,6 @@ import LandingPage from './components/LandingPage';
 import LoginPage from './components/LoginPage';
 import Dashboard from './components/Dashboard';
 import CameraPage from './components/CameraPage';
-import { useState } from 'react';
 
 function AppRouter() {
   // Track company registration globally

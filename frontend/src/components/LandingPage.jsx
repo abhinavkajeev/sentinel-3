@@ -37,46 +37,9 @@ const LandingPage = ({ onLogin }) => {
     email: '',
     password: ''
   });
-  const [companyRegError, setCompanyRegError] = useState('');
-  const [companyRegLoading, setCompanyRegLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
-  // Admin login handler
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError("");
-    try {
-      const result = await loginAdmin(formData);
-      if (result && result.ok) {
-        console.log('Admin authenticated:', result);
-        navigate('/dashboard');
-      } else {
-        setError(result.error || 'Login failed.');
-        console.log('Admin login failed:', result);
-      }
-    } catch (err) {
-      setError('Login failed.');
-      console.log('Admin login failed:', err);
-    }
-    setIsLoading(false);
-  };
-  // Admin login input change handler
-  const handleInputChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
   // Track if company is registered
   const [companyRegistered, setCompanyRegistered] = useState(false);
 
-  // Close all modals
-  const closeModals = () => {
-    setShowLogin(false);
-    setShowCompanyReg(false);
-  };
-  // Wallet connection state
-  const [walletConnected, setWalletConnected] = useState(false);
-  const [walletAddress, setWalletAddress] = useState("");
   // Navbar shrink state
   const [navShrink, setNavShrink] = useState(false);
 
@@ -91,51 +54,6 @@ const LandingPage = ({ onLogin }) => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-  // ...existing code...
-  const [showLogin, setShowLogin] = useState(false);
-  const [formData, setFormData] = useState({ username: '', password: '' });
-  const [showCompanyReg, setShowCompanyReg] = useState(false);
-  const [companyRegData, setCompanyRegData] = useState({ companyName: '', phoneNumber: '', email: '', password: '' });
-  const [companyRegError, setCompanyRegError] = useState('');
-  const [companyRegLoading, setCompanyRegLoading] = useState(false);
-  // ...existing code...
-  // ...existing code...
-  // Only keep the advanced framer-motion UI and logic below
-
-  // ...existing code...
-  const handleCompanyRegChange = (e) => {
-    setCompanyRegData({
-      ...companyRegData,
-      [e.target.name]: e.target.value
-    });
-  };
-  
-
-  const handleCompanyRegSubmit = async (e) => {
-    e.preventDefault();
-    setCompanyRegLoading(true);
-    setCompanyRegError('');
-    // Basic validation
-    if (!companyRegData.companyName || !companyRegData.phoneNumber || !companyRegData.email || !companyRegData.password) {
-      setCompanyRegError('All fields are required.');
-      setCompanyRegLoading(false);
-      return;
-    }
-    // Simulate API call
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1200));
-      // Here you would call registerCompany and check response
-      // Example: const result = await registerCompany(companyRegData);
-      // if (result.ok) { ... }
-      alert('Company registered successfully!');
-      setCompanyRegistered(true);
-      console.log('Company registration data sent:', companyRegData);
-    } catch (err) {
-      setCompanyRegError('Registration failed.');
-      console.log('Company registration failed:', err);
-    }
-    closeModals();
-  };
 
   // Leather Wallet connect logic
   const handleConnectWallet = async () => {
@@ -240,9 +158,9 @@ const LandingPage = ({ onLogin }) => {
 
         <div className="flex items-center space-x-6">
           {/* Company Registration Button: always visible until registered */}
-          {!companyRegistered && (
+          {!companyRegistered ? (
             <button
-              onClick={() => navigate('/login?mode=register')}
+              onClick={() => setShowCompanyReg(true)}
               className="px-6 py-2 border border-yellow-400 rounded-full bg-yellow-300 text-black font-semibold text-sm shadow-sm transition-all duration-200 transform hover:scale-105 hover:bg-yellow-200 hover:border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-300"
               type="button"
             >
@@ -267,13 +185,6 @@ const LandingPage = ({ onLogin }) => {
             type="button"
           >
             Admin Login
-          </button>
-          <button
-            onClick={() => setShowCompanyReg(true)}
-            className="px-6 py-2 border border-yellow-400 rounded-full bg-yellow-300 text-black font-semibold text-sm shadow-sm transition-all duration-200 transform hover:scale-105 hover:bg-yellow-200 hover:border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-300"
-            type="button"
-          >
-            Company Registration
           </button>
         </div>
 
