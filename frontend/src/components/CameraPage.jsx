@@ -223,6 +223,17 @@ const CameraPage = () => {
           <p className="text-gray-400 max-w-md mx-auto">
             Automatic face detection with IPFS storage and blockchain logging
           </p>
+          
+          {/* Beautiful Back Button */}
+          <div className="mt-6">
+            <button
+              onClick={() => navigate('/')}
+              className="group flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-gray-800/50 to-gray-700/50 hover:from-yellow-400/20 hover:to-yellow-500/20 border border-gray-600/50 hover:border-yellow-400/50 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-yellow-400/20"
+            >
+              <ArrowLeft size={18} className="text-gray-400 group-hover:text-yellow-400 transition-colors duration-300" />
+              <span className="text-gray-300 group-hover:text-yellow-400 font-medium transition-colors duration-300">Back to Landing Page</span>
+            </button>
+          </div>
         </div>
 
         {/* Error Alert */}

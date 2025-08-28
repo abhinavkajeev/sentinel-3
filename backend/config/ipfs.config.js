@@ -24,7 +24,7 @@ export const ipfsConfigs = {
     port: 5001,
     protocol: 'http',
     auth: null,
-    gateway: 'http://localhost:8080/ipfs'
+    gateway: 'http://localhost:5173/ipfs'
   },
 
   // Web3.Storage (Filecoin + IPFS)

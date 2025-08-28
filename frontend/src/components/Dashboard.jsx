@@ -17,7 +17,8 @@ import {
   ChevronsLeft,
   ChevronsRight,
   Fingerprint,
-  LogOut as LogOutIcon
+  LogOut as LogOutIcon,
+  ArrowLeft
 } from 'lucide-react';
 
 const Dashboard = () => {
@@ -202,7 +203,19 @@ const Dashboard = () => {
       {/* CHANGED: Added overflow-y-auto to enable scrolling only for this element */}
       <main className="flex-1 p-8 overflow-y-auto">
         <header className="flex items-center justify-between mb-8">
-          <h2 className="text-3xl font-bold text-white">Security Event Dashboard</h2>
+          <div className="flex items-center space-x-6">
+            <h2 className="text-3xl font-bold text-white">Security Event Dashboard</h2>
+            
+            {/* Beautiful Back Button */}
+            <button
+              onClick={() => navigate('/')}
+              className="group flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-gray-800/50 to-gray-700/50 hover:from-yellow-400/20 hover:to-yellow-500/20 border border-gray-600/50 hover:border-yellow-400/50 rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-yellow-400/20"
+            >
+              <ArrowLeft size={16} className="text-gray-400 group-hover:text-yellow-400 transition-colors duration-300" />
+              <span className="text-gray-300 group-hover:text-yellow-400 font-medium text-sm transition-colors duration-300">Back to Landing</span>
+            </button>
+          </div>
+          
           <div className="relative w-full max-w-xs">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={20} />
             <input type="text" placeholder="Search events..." className="w-full bg-black/20 border border-white/10 rounded-lg py-2.5 pl-12 pr-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-400/50"/>
