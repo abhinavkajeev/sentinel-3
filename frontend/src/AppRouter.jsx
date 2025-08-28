@@ -1,10 +1,9 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { useAuth } from './contexts/AuthContext.jsx';
 import LandingPage from './components/LandingPage';
 import Dashboard from './components/Dashboard';
 import CameraPage from './components/CameraPage';
-import { useState } from 'react';
-import { Navigate } from 'react-router-dom';
 
 function AppRouter() {
   // Track company registration globally
@@ -13,9 +12,9 @@ function AppRouter() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<LandingPage setCompanyRegistered={setCompanyRegistered} companyRegistered={companyRegistered} />} />
-        <Route path="/dashboard" element={companyRegistered ? <Dashboard /> : <Navigate to="/" replace />} />
-        <Route path="/camera" element={companyRegistered ? <CameraPage /> : <Navigate to="/" replace />} />
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/camera" element={<CameraPage />} />
       </Routes>
     </Router>
   );

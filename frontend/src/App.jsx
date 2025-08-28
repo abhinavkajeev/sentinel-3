@@ -6,10 +6,15 @@
 
 
 import React from 'react';
+import { AuthProvider } from './contexts/AuthContext.jsx';
 import AppRouter from './AppRouter';
 
 function App() {
-  return <AppRouter />;
+  return (
+    <AuthProvider>
+      <AppRouter />
+    </AuthProvider>
+  );
 }
 
 export default App;

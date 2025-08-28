@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { connectWallet, disconnectWallet } from '../blockchain/stacks';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -23,13 +24,24 @@ import {
   AlertTriangle
 } from 'lucide-react';
 
-// ...existing code...
-
-const LandingPage = () => {
-  // Track admin login state
-  const [adminLoggedIn, setAdminLoggedIn] = useState(false);
-  const navigate = useNavigate();
-  // Admin login loading and error state
+const LandingPage = ({ onLogin }) => {
+  const [showLogin, setShowLogin] = useState(false);
+  const [walletAddress, setWalletAddress] = useState("");
+  const [walletConnected, setWalletConnected] = useState(false);
+  const [formData, setFormData] = useState({
+    username: '',
+    password: ''
+  });
+  const [showCompanyReg, setShowCompanyReg] = useState(false);
+  const [companyRegData, setCompanyRegData] = useState({
+    companyName: '',
+    phoneNumber: '',
+    email: '',
+    password: ''
+  });
+  const [companyRegError, setCompanyRegError] = useState('');
+  const [companyRegLoading, setCompanyRegLoading] = useState(false);
+  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   // Admin login handler
@@ -178,17 +190,12 @@ const LandingPage = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: 'easeOut' }}
       >
-        <motion.div 
-          className="flex items-center space-x-3"
-          variants={logoVariants}
-          whileHover="hover"
-          whileTap="tap"
-        >
+        <div className="flex items-center space-x-3">
           <div className="w-8 h-8 flex items-center justify-center">
             <Shield className="text-white w-8 h-8" />
           </div>
           <span className="text-xl font-bold">Sentinel-3</span>
-        </motion.div>
+        </div>
 
         {/* Fixed nav links only */}
         <motion.div
@@ -243,27 +250,33 @@ const LandingPage = () => {
             >
               Company Registration
             </button>
+          ) : (
+            <div className="flex items-center space-x-3">
+              <span className="text-xs bg-gray-800 text-white px-3 py-1 rounded-full">{walletAddress}</span>
+              <button
+                onClick={handleDisconnectWallet}
+                className="px-4 py-2 border border-red-400 rounded-full bg-red-300 text-black font-semibold text-xs shadow-sm transition-all duration-200 transform hover:scale-105 hover:bg-red-200 hover:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-300"
+                type="button"
+              >
+                Disconnect
+              </button>
+            </div>
           )}
-          {/* Admin Login Button: only visible after company is registered and before admin logs in */}
-          {companyRegistered && !adminLoggedIn && (
-            <button
-              onClick={() => setShowLogin(true)}
-              className="px-6 py-2 border border-gray-400 rounded-full bg-white text-black font-semibold text-sm shadow-sm transition-all duration-200 transform hover:scale-105 hover:bg-gray-100 hover:border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-              type="button"
-            >
-              Admin Login
-            </button>
-          )}
-          {/* Dashboard Button: only visible after admin logs in */}
-          {adminLoggedIn && (
-            <button
-              onClick={() => navigate('/dashboard')}
-              className="px-6 py-2 border border-green-400 rounded-full bg-green-300 text-black font-semibold text-sm shadow-sm transition-all duration-200 transform hover:scale-105 hover:bg-green-200 hover:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-300"
-              type="button"
-            >
-              Go to Dashboard
-            </button>
-          )}
+          {/* Existing buttons */}
+          <button
+            onClick={() => setShowLogin(true)}
+            className="px-6 py-2 border border-gray-400 rounded-full bg-white text-black font-semibold text-sm shadow-sm transition-all duration-200 transform hover:scale-105 hover:bg-gray-100 hover:border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+            type="button"
+          >
+            Admin Login
+          </button>
+          <button
+            onClick={() => setShowCompanyReg(true)}
+            className="px-6 py-2 border border-yellow-400 rounded-full bg-yellow-300 text-black font-semibold text-sm shadow-sm transition-all duration-200 transform hover:scale-105 hover:bg-yellow-200 hover:border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-300"
+            type="button"
+          >
+            Company Registration
+          </button>
         </div>
       {/* Company Registration Modal */}
       <AnimatePresence>

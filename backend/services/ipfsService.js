@@ -2,6 +2,8 @@ import { create } from 'ipfs-http-client';
 import FormData from 'form-data';
 import fs from 'fs';
 import path from 'path';
+import fetch from 'node-fetch';
+import {PinataSDK} from 'pinata';
 import { getIPFSConfig } from '../config/ipfs.config.js';
 
 class IPFSService {
@@ -21,7 +23,18 @@ class IPFSService {
     });
     
     this.gateway = config.gateway;
-    console.log(`IPFS Service initialized with ${config.host}:${config.port}`);
+    this.provider = process.env.IPFS_PROVIDER || 'infura';
+    
+    // Initialize Pinata SDK if using Pinata
+    if (this.provider === 'pinata') {
+      this.pinata = new PinataSDK({
+        pinataJwt: process.env.PINATA_JWT,
+        pinataGateway: process.env.GATEWAY_URL ? `https://${process.env.GATEWAY_URL}` : 'https://gateway.pinata.cloud'
+      });
+      console.log(`Pinata SDK initialized with JWT token`);
+    }
+    
+    console.log(`IPFS Service initialized with ${this.provider} at ${config.host}:${config.port}`);
   }
 
   /**
@@ -32,11 +45,90 @@ class IPFSService {
    */
   async uploadImage(imageBuffer, filename = 'image.jpg') {
     try {
+      if (this.provider === 'pinata') {
+        return await this.uploadToPinata(imageBuffer, filename);
+      } else {
+        return await this.uploadToStandardIPFS(imageBuffer, filename);
+      }
+    } catch (error) {
+      console.error('IPFS upload error:', error);
+      throw new Error(`Failed to upload image to IPFS: ${error.message}`);
+    }
+  }
+
+  /**
+   * Upload to Pinata IPFS
+   * @param {Buffer} imageBuffer - Image buffer
+   * @param {string} filename - Original filename
+   * @returns {Promise<{hash: string, url: string}>}
+   */
+  async uploadToPinata(imageBuffer, filename = 'image.jpg') {
+    try {
+      const config = getIPFSConfig();
+      
+      // Create form data for Pinata
+      const formData = new FormData();
+      formData.append('file', imageBuffer, {
+        filename,
+        contentType: 'image/jpeg'
+      });
+
+      // Add metadata
+      formData.append('pinataMetadata', JSON.stringify({
+        name: filename,
+        keyvalues: {
+          app: 'Sentinel-3',
+          timestamp: new Date().toISOString(),
+          type: 'security-camera'
+        }
+      }));
+
+      // Upload to Pinata using HTTP API
+      const response = await fetch(`https://${config.host}/pinning/pinFileToIPFS`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.PINATA_JWT}`
+        },
+        body: formData
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Pinata upload failed: ${response.status} - ${errorText}`);
+      }
+
+      const result = await response.json();
+      const hash = result.IpfsHash;
+      
+      // Generate Pinata gateway URL
+      const url = this.getGatewayUrl(hash);
+      
+      console.log(`Image uploaded to Pinata IPFS: ${hash}`);
+      
+      return {
+        hash,
+        url,
+        cid: hash
+      };
+    } catch (error) {
+      console.error('Pinata upload error:', error);
+      throw new Error(`Failed to upload to Pinata: ${error.message}`);
+    }
+  }
+
+  /**
+   * Upload to standard IPFS
+   * @param {Buffer} imageBuffer - Image buffer
+   * @param {string} filename - Original filename
+   * @returns {Promise<{hash: string, url: string}>}
+   */
+  async uploadToStandardIPFS(imageBuffer, filename = 'image.jpg') {
+    try {
       // Create form data for IPFS upload
       const formData = new FormData();
       formData.append('file', imageBuffer, {
         filename,
-        contentType: 'image/jpeg' // Adjust based on your image type
+        contentType: 'image/jpeg'
       });
 
       // Upload to IPFS
@@ -56,8 +148,8 @@ class IPFSService {
         cid: hash
       };
     } catch (error) {
-      console.error('IPFS upload error:', error);
-      throw new Error(`Failed to upload image to IPFS: ${error.message}`);
+      console.error('Standard IPFS upload error:', error);
+      throw new Error(`Failed to upload to IPFS: ${error.message}`);
     }
   }
 
