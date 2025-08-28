@@ -1,36 +1,32 @@
 // backend/server.js
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
+import dotenv from 'dotenv';
+import express from 'express';
+import cors from 'cors';
+import mongoose from 'mongoose';
+import companyRoutes from './routes/companyRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
+import sessionRoutes from './routes/sessionRoutes.js';
+
+dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3070;
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 
-// In-memory event log (replace with DB or blockchain integration as needed)
-let eventLog = [];
+// MongoDB connection
+if (!process.env.MONGODB_URI) {
+  console.warn('MONGODB_URI not set; set it in backend/.env');
+}
+mongoose
+  .connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/sentinel3')
+  .then(() => console.log('MongoDB connected'))
+  .catch((err) => console.error('MongoDB connection error', err));
 
-// GET /events - return all events
-app.get('/events', (req, res) => {
-  res.json(eventLog);
-});
-
-// POST /record-event - add a new event
-app.post('/record-event', (req, res) => {
-  const { location, eventType, dataHash } = req.body;
-  if (!location || !eventType || !dataHash) {
-    return res.status(400).json({ error: 'Missing required fields.' });
-  }
-  const event = {
-    timestamp: new Date().toISOString(),
-    location,
-    eventType,
-    dataHash
-  };
-  eventLog.push(event);
-  res.status(201).json({ message: 'Event recorded.', event });
-});
+// Routes
+app.use('/api/company', companyRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/sessions', sessionRoutes);
 
 // Health check
 app.get('/', (req, res) => {
