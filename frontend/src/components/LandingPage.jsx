@@ -266,7 +266,7 @@ const LandingPage = ({ onLogin }) => {
               </div>
               <form className="space-y-4" onSubmit={handleCompanyRegSubmit}>
                 <div>
-                  <label className="block text-gray-400 mb-2 text-sm flex items-center space-x-2">
+                  <label className="text-gray-400 mb-2 text-sm flex items-center space-x-2">
                     <span>Company Name</span>
                   </label>
                   <input
