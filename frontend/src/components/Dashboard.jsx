@@ -93,8 +93,6 @@ const Dashboard = () => {
             {[
               { icon: LayoutGrid, label: 'Dashboard', active: true, onClick: () => navigate('/dashboard') },
               { icon: Video, label: 'Live Feed', onClick: () => navigate('/camera') },
-              { icon: FileText, label: 'Event Logs', onClick: () => navigate('/eventlog') },
-              { icon: Users, label: 'Personnel' },
             ].map((item) => (
               <button
                 key={item.label}
