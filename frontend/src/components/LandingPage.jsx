@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { connectWallet, disconnectWallet } from '../blockchain/stacks';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import { 
@@ -23,6 +24,8 @@ import {
 const LandingPage = () => {
   const navigate = useNavigate();
   const [showLogin, setShowLogin] = useState(false);
+  const [walletAddress, setWalletAddress] = useState("");
+  const [walletConnected, setWalletConnected] = useState(false);
   const [formData, setFormData] = useState({
     username: '',
     password: ''
@@ -143,6 +146,35 @@ const LandingPage = () => {
     closeModals();
   };
 
+  // Leather Wallet connect logic
+  const handleConnectWallet = async () => {
+    try {
+      await connectWallet(({ stxAddress }) => {
+        setWalletAddress(stxAddress);
+        setWalletConnected(true);
+        // Authenticate with backend
+        fetch("/backend/auth", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ address: stxAddress }),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            // Handle backend response (dummy)
+            // You can set some state if needed
+          });
+      });
+    } catch (err) {
+      // Handle error
+    }
+  };
+
+  const handleDisconnectWallet = () => {
+    disconnectWallet();
+    setWalletAddress("");
+    setWalletConnected(false);
+  };
+
   const logoVariants = {
     hover: { rotate: 360 },
     tap: { scale: 0.95 }
@@ -165,17 +197,12 @@ const LandingPage = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: 'easeOut' }}
       >
-        <motion.div 
-          className="flex items-center space-x-3"
-          variants={logoVariants}
-          whileHover="hover"
-          whileTap="tap"
-        >
+        <div className="flex items-center space-x-3">
           <div className="w-8 h-8 flex items-center justify-center">
             <Shield className="text-white w-8 h-8" />
           </div>
           <span className="text-xl font-bold">Sentinel-3</span>
-        </motion.div>
+        </div>
 
         {/* Fixed nav links only */}
         <motion.div
@@ -221,6 +248,28 @@ const LandingPage = () => {
   </motion.div>
 
         <div className="flex items-center space-x-6">
+          {/* Leather Wallet Connect Button */}
+          {!walletConnected ? (
+            <button
+              onClick={handleConnectWallet}
+              className="px-6 py-2 border border-blue-400 rounded-full bg-blue-300 text-black font-semibold text-sm shadow-sm transition-all duration-200 transform hover:scale-105 hover:bg-blue-200 hover:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-300"
+              type="button"
+            >
+              Connect Leather Wallet
+            </button>
+          ) : (
+            <div className="flex items-center space-x-3">
+              <span className="text-xs bg-gray-800 text-white px-3 py-1 rounded-full">{walletAddress}</span>
+              <button
+                onClick={handleDisconnectWallet}
+                className="px-4 py-2 border border-red-400 rounded-full bg-red-300 text-black font-semibold text-xs shadow-sm transition-all duration-200 transform hover:scale-105 hover:bg-red-200 hover:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-300"
+                type="button"
+              >
+                Disconnect
+              </button>
+            </div>
+          )}
+          {/* Existing buttons */}
           <button
             onClick={() => navigate('/login')}
             className="px-6 py-2 border border-gray-400 rounded-full bg-white text-black font-semibold text-sm shadow-sm transition-all duration-200 transform hover:scale-105 hover:bg-gray-100 hover:border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400"
