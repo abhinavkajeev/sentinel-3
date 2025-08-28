@@ -25,56 +25,14 @@ import {
 
 const LandingPage = ({ onLogin }) => {
   const navigate = useNavigate();
-  const [showLogin, setShowLogin] = useState(false);
   const [walletAddress, setWalletAddress] = useState("");
   const [walletConnected, setWalletConnected] = useState(false);
-  const [formData, setFormData] = useState({
-    username: '',
-    password: ''
-  });
-  const [showCompanyReg, setShowCompanyReg] = useState(false);
-  const [companyRegData, setCompanyRegData] = useState({
-    companyName: '',
-    phoneNumber: '',
-    email: '',
-    password: ''
-  });
-  const [companyRegError, setCompanyRegError] = useState('');
-  const [companyRegLoading, setCompanyRegLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  // Admin login handler
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError("");
-    try {
-      const result = await loginAdmin(formData);
-      if (result && result.ok) {
-        console.log('Admin authenticated:', result);
-        navigate('/dashboard');
-      } else {
-        setError(result.error || 'Login failed.');
-        console.log('Admin login failed:', result);
-      }
-    } catch (err) {
-      setError('Login failed.');
-      console.log('Admin login failed:', err);
-    }
-    setIsLoading(false);
-  };
-  // Admin login input change handler
-  const handleInputChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+
+
   // Track if company is registered
   const [companyRegistered, setCompanyRegistered] = useState(false);
 
-  // Close all modals
-  const closeModals = () => {
-    setShowLogin(false);
-    setShowCompanyReg(false);
-  };
+
   // Navbar shrink state
   const [navShrink, setNavShrink] = useState(false);
 
@@ -89,40 +47,7 @@ const LandingPage = ({ onLogin }) => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-  // Only keep the advanced framer-motion UI and logic below
-  const handleCompanyRegChange = (e) => {
-    setCompanyRegData({
-      ...companyRegData,
-      [e.target.name]: e.target.value
-    });
-  };
-  
 
-  const handleCompanyRegSubmit = async (e) => {
-    e.preventDefault();
-    setCompanyRegLoading(true);
-    setCompanyRegError('');
-    // Basic validation
-    if (!companyRegData.companyName || !companyRegData.phoneNumber || !companyRegData.email || !companyRegData.password) {
-      setCompanyRegError('All fields are required.');
-      setCompanyRegLoading(false);
-      return;
-    }
-    // Simulate API call
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1200));
-      // Here you would call registerCompany and check response
-      // Example: const result = await registerCompany(companyRegData);
-      // if (result.ok) { ... }
-      alert('Company registered successfully!');
-      setCompanyRegistered(true);
-      console.log('Company registration data sent:', companyRegData);
-    } catch (err) {
-      setCompanyRegError('Registration failed.');
-      console.log('Company registration failed:', err);
-    }
-    closeModals();
-  };
 
   // Leather Wallet connect logic
   const handleConnectWallet = async () => {
@@ -229,7 +154,7 @@ const LandingPage = ({ onLogin }) => {
           {/* Company Registration Button */}
           {!companyRegistered && (
             <button
-              onClick={() => setShowCompanyReg(true)}
+              onClick={() => navigate('/login?mode=register')}
               className="px-6 py-2 border border-yellow-400 rounded-full bg-yellow-300 text-black font-semibold text-sm shadow-sm transition-all duration-200 transform hover:scale-105 hover:bg-yellow-200 hover:border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-300"
               type="button"
             >
@@ -253,121 +178,14 @@ const LandingPage = ({ onLogin }) => {
           
           {/* Admin Login Button */}
           <button
-            onClick={() => setShowLogin(true)}
+            onClick={() => navigate('/login')}
             className="px-6 py-2 border border-gray-400 rounded-full bg-white text-black font-semibold text-sm shadow-sm transition-all duration-200 transform hover:scale-105 hover:bg-gray-100 hover:border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400"
             type="button"
           >
             Admin Login
           </button>
         </div>
-      {/* Company Registration Modal */}
-      <AnimatePresence>
-        {showCompanyReg && (
-          <motion.div 
-            className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <motion.div 
-              className="bg-gray-900 rounded-3xl p-8 w-full max-w-md border border-gray-800"
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.8, opacity: 0 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-            >
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-light text-white flex items-center space-x-3">
-                  <KeyRound size={24} />
-                  <span>Company Registration</span>
-                </h2>
-                <motion.button 
-                  onClick={closeModals}
-                  className="text-gray-400 hover:text-white"
-                  whileHover={{ scale: 1.1, rotate: 90 }}
-                  whileTap={{ scale: 0.9 }}
-                >
-                  <X size={24} />
-                </motion.button>
-              </div>
-              <form className="space-y-4" onSubmit={handleCompanyRegSubmit}>
-                <div>
-                  <label className="text-gray-400 mb-2 text-sm flex items-center space-x-2">
-                    <span>Company Name</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="companyName"
-                    value={companyRegData.companyName}
-                    onChange={handleCompanyRegChange}
-                    className="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white focus:border-yellow-400 focus:outline-none transition-colors"
-                    placeholder="Enter company name"
-                  />
-                </div>
-                <div>
-                  <label className="text-gray-400 mb-2 text-sm flex items-center space-x-2">
-                    <span>Phone Number</span>
-                  </label>
-                  <input
-                    type="tel"
-                    name="phoneNumber"
-                    value={companyRegData.phoneNumber}
-                    onChange={handleCompanyRegChange}
-                    className="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white focus:border-yellow-400 focus:outline-none transition-colors"
-                    placeholder="Enter phone number"
-                  />
-                </div>
-                <div>
-                  <label className="text-gray-400 mb-2 text-sm flex items-center space-x-2">
-                    <span>Email</span>
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={companyRegData.email}
-                    onChange={handleCompanyRegChange}
-                    className="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white focus:border-yellow-400 focus:outline-none transition-colors"
-                    placeholder="Enter email address"
-                  />
-                </div>
-                <div>
-                  <label className="text-gray-400 mb-2 text-sm flex items-center space-x-2">
-                    <span>Password</span>
-                  </label>
-                  <input
-                    type="password"
-                    name="password"
-                    value={companyRegData.password}
-                    onChange={handleCompanyRegChange}
-                    className="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white focus:border-yellow-400 focus:outline-none transition-colors"
-                    placeholder="Create password"
-                  />
-                </div>
-                <AnimatePresence>
-                  {companyRegError && (
-                    <motion.div 
-                      className="bg-red-500/20 border border-red-500/50 text-red-300 p-3 rounded-xl text-sm flex items-center space-x-2"
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                    >
-                      <AlertTriangle size={16} />
-                      <span>{companyRegError}</span>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-                <button
-                  type="submit"
-                  disabled={companyRegLoading}
-                  className="w-full bg-yellow-300 text-black py-3 rounded-xl font-medium hover:bg-yellow-200 transition-colors disabled:opacity-50"
-                >
-                  {companyRegLoading ? 'Registering...' : 'Register Company'}
-                </button>
-              </form>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+
       </motion.nav>
 
       {/* News Badge */}
@@ -413,7 +231,7 @@ const LandingPage = ({ onLogin }) => {
           </motion.div>
 
           <motion.button 
-            onClick={() => setShowLogin(true)}
+            onClick={() => navigate('/login')}
             className="bg-yellow-400 text-black px-8 py-4 rounded-full text-lg font-medium hover:bg-yellow-300 transition-all duration-300 shadow-2xl"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -716,119 +534,7 @@ const LandingPage = ({ onLogin }) => {
         </section>
       </main>
 
-      {/* Login Modal */}
-      <AnimatePresence>
-        {showLogin && (
-          <motion.div 
-            className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <motion.div 
-              className="bg-gray-900 rounded-3xl p-8 w-full max-w-md border border-gray-800"
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.8, opacity: 0 }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            >
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-light text-white flex items-center space-x-3">
-                  <User size={24} />
-                  <span>Admin Login</span>
-                </h2>
-                <motion.button 
-                  onClick={closeModals}
-                  className="text-gray-400 hover:text-white"
-                  whileHover={{ scale: 1.1, rotate: 90 }}
-                  whileTap={{ scale: 0.9 }}
-                >
-                  <X size={24} />
-                </motion.button>
-              </div>
-              
-              <div className="space-y-4">
-                <div>
-                  <label className="text-gray-400 mb-2 text-sm flex items-center space-x-2">
-                    <User size={16} />
-                    <span>Username</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="username"
-                    value={formData.username}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white focus:border-yellow-400 focus:outline-none transition-colors"
-                    placeholder="Enter admin username"
-                  />
-                </div>
-                
-                <div>
-                  <label className=" text-gray-400 mb-2 text-sm flex items-center space-x-2">
-                    <Lock size={16} />
-                    <span>Password</span>
-                  </label>
-                  <input
-                    type="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white focus:border-yellow-400 focus:outline-none transition-colors"
-                    placeholder="Enter password"
-                  />
-                </div>
 
-                <AnimatePresence>
-                  {error && (
-                    <motion.div 
-                      className="bg-red-500/20 border border-red-500/50 text-red-300 p-3 rounded-xl text-sm flex items-center space-x-2"
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                    >
-                      <AlertTriangle size={16} />
-                      <span>{error}</span>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-
-                <motion.button
-                  onClick={handleLogin}
-                  disabled={isLoading}
-                  className="w-full bg-yellow-300 text-black py-3 rounded-xl font-medium hover:bg-yellow-200 transition-colors disabled:opacity-50"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  {isLoading ? (
-                    <div className="flex items-center justify-center space-x-2">
-                      <motion.div
-                        className="w-5 h-5 border-2 border-black border-t-transparent rounded-full"
-                        animate={{ rotate: 360 }}
-                        transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-                      />
-                      <span>Authenticating...</span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-center space-x-2">
-                      <Activity size={18} />
-                      <span>Access Dashboard</span>
-                    </div>
-                  )}
-                </motion.button>
-
-                <div className="mt-4 text-center">
-                  <div className="bg-gray-800/50 rounded-lg p-3 border border-gray-700/50">
-                    <p className="text-gray-400 text-sm flex items-center justify-center space-x-2">
-                      <CheckCircle2 size={16} className="text-green-400" />
-                      <span>Demo: admin / sentinel123</span>
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
     </div>
   );
