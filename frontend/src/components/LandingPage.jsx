@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { connectWallet, disconnectWallet } from '../blockchain/stacks';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
 import { registerCompany } from '../services/companyService';
 import { loginAdmin } from '../services/adminService';
 
@@ -25,6 +24,7 @@ import {
 } from 'lucide-react';
 
 const LandingPage = ({ onLogin }) => {
+  const navigate = useNavigate();
   const [showLogin, setShowLogin] = useState(false);
   const [walletAddress, setWalletAddress] = useState("");
   const [walletConnected, setWalletConnected] = useState(false);
@@ -43,7 +43,6 @@ const LandingPage = ({ onLogin }) => {
   const [companyRegLoading, setCompanyRegLoading] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
   // Admin login handler
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -76,9 +75,6 @@ const LandingPage = ({ onLogin }) => {
     setShowLogin(false);
     setShowCompanyReg(false);
   };
-  // Wallet connection state
-  const [walletConnected, setWalletConnected] = useState(false);
-  const [walletAddress, setWalletAddress] = useState("");
   // Navbar shrink state
   const [navShrink, setNavShrink] = useState(false);
 
@@ -93,18 +89,7 @@ const LandingPage = ({ onLogin }) => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-  // ...existing code...
-  const [showLogin, setShowLogin] = useState(false);
-  const [formData, setFormData] = useState({ username: '', password: '' });
-  const [showCompanyReg, setShowCompanyReg] = useState(false);
-  const [companyRegData, setCompanyRegData] = useState({ companyName: '', phoneNumber: '', email: '', password: '' });
-  const [companyRegError, setCompanyRegError] = useState('');
-  const [companyRegLoading, setCompanyRegLoading] = useState(false);
-  // ...existing code...
-  // ...existing code...
   // Only keep the advanced framer-motion UI and logic below
-
-  // ...existing code...
   const handleCompanyRegChange = (e) => {
     setCompanyRegData({
       ...companyRegData,
@@ -241,7 +226,7 @@ const LandingPage = ({ onLogin }) => {
   </motion.div>
 
         <div className="flex items-center space-x-6">
-          {/* Company Registration Button: always visible until registered */}
+          {/* Company Registration Button */}
           {!companyRegistered && (
             <button
               onClick={() => setShowCompanyReg(true)}
@@ -250,7 +235,10 @@ const LandingPage = ({ onLogin }) => {
             >
               Company Registration
             </button>
-          ) : (
+          )}
+          
+          {/* Wallet connection status */}
+          {companyRegistered && (
             <div className="flex items-center space-x-3">
               <span className="text-xs bg-gray-800 text-white px-3 py-1 rounded-full">{walletAddress}</span>
               <button
@@ -262,20 +250,14 @@ const LandingPage = ({ onLogin }) => {
               </button>
             </div>
           )}
-          {/* Existing buttons */}
+          
+          {/* Admin Login Button */}
           <button
             onClick={() => setShowLogin(true)}
             className="px-6 py-2 border border-gray-400 rounded-full bg-white text-black font-semibold text-sm shadow-sm transition-all duration-200 transform hover:scale-105 hover:bg-gray-100 hover:border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400"
             type="button"
           >
             Admin Login
-          </button>
-          <button
-            onClick={() => setShowCompanyReg(true)}
-            className="px-6 py-2 border border-yellow-400 rounded-full bg-yellow-300 text-black font-semibold text-sm shadow-sm transition-all duration-200 transform hover:scale-105 hover:bg-yellow-200 hover:border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-300"
-            type="button"
-          >
-            Company Registration
           </button>
         </div>
       {/* Company Registration Modal */}
