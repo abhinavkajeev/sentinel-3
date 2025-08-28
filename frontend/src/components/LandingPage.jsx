@@ -195,17 +195,12 @@ const LandingPage = ({ onLogin }) => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: 'easeOut' }}
       >
-        <motion.div 
-          className="flex items-center space-x-3"
-          variants={logoVariants}
-          whileHover="hover"
-          whileTap="tap"
-        >
+        <div className="flex items-center space-x-3">
           <div className="w-8 h-8 flex items-center justify-center">
             <Shield className="text-white w-8 h-8" />
           </div>
           <span className="text-xl font-bold">Sentinel-3</span>
-        </motion.div>
+        </div>
 
         {/* Fixed nav links only */}
         <motion.div
