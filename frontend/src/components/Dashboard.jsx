@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Search, 
   LayoutGrid, 
@@ -71,6 +72,7 @@ const Dashboard = () => {
     }
   };
 
+  const navigate = useNavigate();
   return (
     // CHANGED: Set a fixed screen height and removed overflow-hidden
     <div className="flex h-screen bg-[#0A0A0A] text-gray-300 font-sans">
@@ -82,22 +84,27 @@ const Dashboard = () => {
       <aside className={`bg-black/30 backdrop-blur-md p-4 flex flex-col justify-between border-r border-white/10 transition-all duration-300 ease-in-out ${isSidebarOpen ? 'w-64' : 'w-20'}`}>
         <div>
           <div className={`flex items-center ${isSidebarOpen ? 'space-x-3' : 'justify-center'} mb-10`}>
-            <div className="w-10 h-10 bg-green-400/90 rounded-lg flex items-center justify-center">
+            <div className="w-10 h-10 bg-yellow-400/90 rounded-lg flex items-center justify-center">
               <Shield className="text-black" />
             </div>
             {isSidebarOpen && <h1 className="text-2xl font-bold text-white">Sentinel-3</h1>}
           </div>
           <nav className="space-y-2">
             {[
-              { icon: LayoutGrid, label: 'Dashboard', active: true },
-              { icon: Video, label: 'Live Feed' },
-              { icon: FileText, label: 'Event Logs' },
+              { icon: LayoutGrid, label: 'Dashboard', active: true, onClick: () => navigate('/dashboard') },
+              { icon: Video, label: 'Live Feed', onClick: () => navigate('/camera') },
+              { icon: FileText, label: 'Event Logs', onClick: () => navigate('/eventlog') },
               { icon: Users, label: 'Personnel' },
             ].map((item) => (
-              <a key={item.label} href="#" className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors duration-200 ${!isSidebarOpen && 'justify-center'} ${item.active ? 'bg-green-400/10 text-green-400' : 'hover:bg-white/10 text-gray-400'}`}>
+              <button
+                key={item.label}
+                onClick={item.onClick}
+                className={`w-full text-left flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors duration-200 ${!isSidebarOpen && 'justify-center'} ${item.active ? 'bg-yellow-400/10 text-yellow-400' : 'hover:bg-white/10 text-gray-400'}`}
+                style={{ background: 'none', border: 'none', outline: 'none', cursor: item.onClick ? 'pointer' : 'default' }}
+              >
                 <item.icon size={20} />
                 {isSidebarOpen && <span className="font-medium">{item.label}</span>}
-              </a>
+              </button>
             ))}
           </nav>
         </div>

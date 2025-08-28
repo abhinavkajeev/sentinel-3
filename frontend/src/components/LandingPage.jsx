@@ -25,6 +25,15 @@ const LandingPage = ({ onLogin }) => {
     username: '',
     password: ''
   });
+  const [showCompanyReg, setShowCompanyReg] = useState(false);
+  const [companyRegData, setCompanyRegData] = useState({
+    companyName: '',
+    phoneNumber: '',
+    email: '',
+    password: ''
+  });
+  const [companyRegError, setCompanyRegError] = useState('');
+  const [companyRegLoading, setCompanyRegLoading] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -94,11 +103,42 @@ const LandingPage = ({ onLogin }) => {
 
   const closeModals = () => {
     setShowLogin(false);
+    setShowCompanyReg(false);
     setError('');
     setFormData({
       username: '',
       password: ''
     });
+    setCompanyRegError('');
+    setCompanyRegData({
+      companyName: '',
+      phoneNumber: '',
+      email: '',
+      password: ''
+    });
+    setCompanyRegLoading(false);
+  };
+  const handleCompanyRegChange = (e) => {
+    setCompanyRegData({
+      ...companyRegData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleCompanyRegSubmit = async (e) => {
+    e.preventDefault();
+    setCompanyRegLoading(true);
+    setCompanyRegError('');
+    // Basic validation
+    if (!companyRegData.companyName || !companyRegData.phoneNumber || !companyRegData.email || !companyRegData.password) {
+      setCompanyRegError('All fields are required.');
+      setCompanyRegLoading(false);
+      return;
+    }
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1200));
+    alert('Company registered successfully!');
+    closeModals();
   };
 
   const logoVariants = {
@@ -186,7 +226,122 @@ const LandingPage = ({ onLogin }) => {
           >
             Admin Login
           </button>
+          <button
+            onClick={() => setShowCompanyReg(true)}
+            className="px-6 py-2 border border-yellow-400 rounded-full bg-yellow-300 text-black font-semibold text-sm shadow-sm transition-all duration-200 transform hover:scale-105 hover:bg-yellow-200 hover:border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-300"
+            type="button"
+          >
+            Company Registration
+          </button>
         </div>
+      {/* Company Registration Modal */}
+      <AnimatePresence>
+        {showCompanyReg && (
+          <motion.div 
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div 
+              className="bg-gray-900 rounded-3xl p-8 w-full max-w-md border border-gray-800"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            >
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-light text-white flex items-center space-x-3">
+                  <KeyRound size={24} />
+                  <span>Company Registration</span>
+                </h2>
+                <motion.button 
+                  onClick={closeModals}
+                  className="text-gray-400 hover:text-white"
+                  whileHover={{ scale: 1.1, rotate: 90 }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <X size={24} />
+                </motion.button>
+              </div>
+              <form className="space-y-4" onSubmit={handleCompanyRegSubmit}>
+                <div>
+                  <label className="block text-gray-400 mb-2 text-sm flex items-center space-x-2">
+                    <span>Company Name</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="companyName"
+                    value={companyRegData.companyName}
+                    onChange={handleCompanyRegChange}
+                    className="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white focus:border-yellow-400 focus:outline-none transition-colors"
+                    placeholder="Enter company name"
+                  />
+                </div>
+                <div>
+                  <label className="block text-gray-400 mb-2 text-sm flex items-center space-x-2">
+                    <span>Phone Number</span>
+                  </label>
+                  <input
+                    type="tel"
+                    name="phoneNumber"
+                    value={companyRegData.phoneNumber}
+                    onChange={handleCompanyRegChange}
+                    className="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white focus:border-yellow-400 focus:outline-none transition-colors"
+                    placeholder="Enter phone number"
+                  />
+                </div>
+                <div>
+                  <label className="block text-gray-400 mb-2 text-sm flex items-center space-x-2">
+                    <span>Email</span>
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={companyRegData.email}
+                    onChange={handleCompanyRegChange}
+                    className="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white focus:border-yellow-400 focus:outline-none transition-colors"
+                    placeholder="Enter email address"
+                  />
+                </div>
+                <div>
+                  <label className="block text-gray-400 mb-2 text-sm flex items-center space-x-2">
+                    <span>Password</span>
+                  </label>
+                  <input
+                    type="password"
+                    name="password"
+                    value={companyRegData.password}
+                    onChange={handleCompanyRegChange}
+                    className="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white focus:border-yellow-400 focus:outline-none transition-colors"
+                    placeholder="Create password"
+                  />
+                </div>
+                <AnimatePresence>
+                  {companyRegError && (
+                    <motion.div 
+                      className="bg-red-500/20 border border-red-500/50 text-red-300 p-3 rounded-xl text-sm flex items-center space-x-2"
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                    >
+                      <AlertTriangle size={16} />
+                      <span>{companyRegError}</span>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+                <button
+                  type="submit"
+                  disabled={companyRegLoading}
+                  className="w-full bg-yellow-300 text-black py-3 rounded-xl font-medium hover:bg-yellow-200 transition-colors disabled:opacity-50"
+                >
+                  {companyRegLoading ? 'Registering...' : 'Register Company'}
+                </button>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       </motion.nav>
 
       {/* News Badge */}
@@ -614,7 +769,7 @@ const LandingPage = ({ onLogin }) => {
                 <motion.button
                   onClick={handleLogin}
                   disabled={isLoading}
-                  className="w-full bg-yellow-400 text-black py-3 rounded-xl font-medium hover:bg-yellow-300 transition-colors disabled:opacity-50"
+                  className="w-full bg-yellow-300 text-black py-3 rounded-xl font-medium hover:bg-yellow-200 transition-colors disabled:opacity-50"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
