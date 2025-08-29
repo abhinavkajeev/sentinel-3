@@ -135,6 +135,49 @@ const Dashboard = () => {
     }
   };
 
+  async function connectLeatherWallet() {
+    // Check if the Leather wallet extension is installed
+    if (typeof window.btc === 'undefined') {
+      alert("Please install the Leather wallet extension first.");
+      // Optionally, direct them to the download page
+      // window.open('https://leather.io/install-extension', '_blank');
+      return;
+    }
+
+    try {
+      // Define the options for the connection request
+      const userAddresses = await window.btc.request('getAddresses');
+
+      if (userAddresses && userAddresses.result.addresses.length > 0) {
+        // The user has connected successfully
+        const btcAddress = userAddresses.result.addresses.find(addr => addr.type === 'p2wpkh');
+
+        if (btcAddress) {
+          console.log("Wallet Connected!");
+          console.log("Your BTC Address (Native SegWit):", btcAddress.address);
+          // You can now use this address in your application
+          const statusElem = document.getElementById("wallet-status");
+          if (statusElem) {
+            statusElem.innerText = `Connected: ${btcAddress.address}`;
+          }
+          return btcAddress.address;
+        } else {
+          alert("Could not find a valid Bitcoin address.");
+          return null;
+        }
+      } else {
+        // This case might occur if the wallet is locked or has no accounts
+        alert("No addresses found. Please unlock your Leather wallet or create an account.");
+        return null;
+      }
+    } catch (error) {
+      // The user rejected the connection request
+      console.error("Connection rejected by user:", error);
+      alert("You rejected the wallet connection request.");
+      return null;
+    }
+  }
+
   return (
     // CHANGED: Set a fixed screen height and removed overflow-hidden
     <div className="flex h-screen bg-[#0A0A0A] text-gray-300 font-sans">
@@ -201,6 +244,15 @@ const Dashboard = () => {
               <ArrowLeft size={16} className="text-gray-400 group-hover:text-yellow-400 transition-colors duration-300" />
               <span className="text-gray-300 group-hover:text-yellow-400 font-medium text-sm transition-colors duration-300">Back to Landing</span>
             </button>
+
+            {/* Wallet Connect Button */}
+            <button
+              onClick={connectLeatherWallet}
+              className="group flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-gray-800/50 to-gray-700/50 hover:from-green-400/20 hover:to-green-500/20 border border-gray-600/50 hover:border-green-400/50 rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-green-400/20"
+            >
+              <span className="text-gray-300 group-hover:text-green-400 font-medium text-sm transition-colors duration-300">Connect Wallet</span>
+            </button>
+            <span id="wallet-status" className="ml-4 text-green-400 text-sm"></span>
           </div>
           
           <div className="relative w-full max-w-xs">
