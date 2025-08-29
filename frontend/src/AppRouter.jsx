@@ -1,6 +1,7 @@
 
 import React from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { AnimatePresence } from "framer-motion";
 import { useAuth } from "./contexts/AuthContext";
 import LandingPage from "./components/LandingPage.jsx";
 import LoginPage from "./components/LoginPage.jsx";
@@ -13,10 +14,12 @@ function ProtectedRoute({ children }) {
   return company ? children : <Navigate to="/login" replace />;
 }
 
-function AppRouter() {
+function AnimatedRoutes() {
+  const location = useLocation();
+  
   return (
-    <Router>
-      <Routes>
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route
@@ -29,6 +32,14 @@ function AppRouter() {
         />
         <Route path="/camera" element={<CameraPage />} />
       </Routes>
+    </AnimatePresence>
+  );
+}
+
+function AppRouter() {
+  return (
+    <Router>
+      <AnimatedRoutes />
     </Router>
   );
 }
