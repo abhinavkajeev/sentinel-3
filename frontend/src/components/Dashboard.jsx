@@ -22,14 +22,14 @@ import {
 } from 'lucide-react';
 
 const Dashboard = () => {
-  const { company, logout } = useAuth();
+  const { company, logout, loading } = useAuth();
   const navigate = useNavigate();
   
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [activeTab, setActiveTab] = useState('All Events');
   const [isAnimating, setIsAnimating] = useState(false);
   const [securityEvents, setSecurityEvents] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // Remove local loading, use AuthContext loading only
   const [stats, setStats] = useState({
     activeCameras: 0,
     securityAlerts: 0,
@@ -38,23 +38,19 @@ const Dashboard = () => {
 
   // Check authentication
   useEffect(() => {
-    if (!company) {
+    if (!loading && !company) {
       navigate('/login');
       return;
     }
-  }, [company, navigate]);
+  }, [company, loading, navigate]);
 
   // Fetch recent sessions from backend
   useEffect(() => {
     const fetchSessions = async () => {
       if (!company) return;
-      
       try {
-        setLoading(true);
         const response = await api.getRecentSessions(company.companyPin, 50);
-        
         if (response.ok && response.sessions) {
-          // Transform sessions into events format
           const events = response.sessions.map(session => {
             const entryEvent = {
               id: session.sessionId + '-ENTRY',
@@ -68,7 +64,6 @@ const Dashboard = () => {
               blockHeight: session.entry?.blockHeight,
               eventId: session.entry?.eventId
             };
-            
             const exitEvent = session.exit ? {
               id: session.sessionId + '-EXIT',
               timestamp: new Date(session.exit.at).toLocaleTimeString(),
@@ -82,13 +77,9 @@ const Dashboard = () => {
               eventId: session.exit.eventId,
               matchConfidence: session.matchConfidence
             } : null;
-            
             return [entryEvent, exitEvent].filter(Boolean);
           }).flat();
-          
           setSecurityEvents(events);
-          
-          // Update stats
           setStats({
             activeCameras: Math.min(48, events.length),
             securityAlerts: events.filter(e => e.status === 'Flagged').length,
@@ -97,7 +88,6 @@ const Dashboard = () => {
         }
       } catch (error) {
         console.error('Failed to fetch sessions:', error);
-        // Fallback to mock data for demo
         setSecurityEvents([
           { id: 'EVT-7B3D9', timestamp: '3:01:12 PM', eventType: 'Entry', status: 'Verified' },
           { id: 'DEV-A4C8E', timestamp: '2:59:45 PM', eventType: 'Attempt', status: 'Flagged' },
@@ -105,11 +95,8 @@ const Dashboard = () => {
           { id: 'EVT-9C55B', timestamp: '2:55:19 PM', eventType: 'Entry', status: 'Verified' },
           { id: 'EVT-E2D44', timestamp: '2:54:30 PM', eventType: 'Exit', status: 'Verified' },
         ]);
-      } finally {
-        setLoading(false);
       }
     };
-
     fetchSessions();
   }, [company]);
   

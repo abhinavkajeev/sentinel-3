@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, Navigate } from 'react-router-dom';
+import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext.jsx';
 import { Shield, Building2, Lock, User, Phone, Mail, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 
@@ -15,8 +16,9 @@ const LoginPage = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  
-  const { login, register, error, clearError } = useAuth();
+  const [companyPinResult, setCompanyPinResult] = useState('');
+  const [loginSuccess, setLoginSuccess] = useState(false);
+  const { login, register, error, clearError, company, setCompany } = useAuth();
   const navigate = useNavigate();
 
   // Check URL parameter to determine initial mode
@@ -36,27 +38,65 @@ const LoginPage = () => {
     if (error) clearError();
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    
+  // Custom login function using axios
+  const handleLoginWithAxios = async (companyPin, password) => {
     try {
-      let result;
-      if (isLogin) {
-        result = await login(formData.companyPin, formData.password);
+      setLoading(true);
+      const response = await axios.post('http://localhost:3040/api/company/login', {
+        companyPin,
+        password
+      });
+      if (response.data && response.data.ok && response.data.company) {
+        localStorage.setItem('sentinel3_company', JSON.stringify(response.data.company));
+        if (setCompany) setCompany(response.data.company);
+        setLoginSuccess(true);
+        setTimeout(() => {
+          window.location.reload();
+          setTimeout(() => {
+            window.location.reload();
+          }, 500);
+        }, 1000);
+        return true;
       } else {
-        result = await register(formData);
-      }
-      
-      if (result.success) {
-        navigate('/dashboard');
+        alert(response.data.error || 'Login failed');
+        return false;
       }
     } catch (err) {
-      console.error('Authentication failed:', err);
+      alert(err.response?.data?.error || err.message || 'Login failed');
+      return false;
     } finally {
       setLoading(false);
     }
   };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setCompanyPinResult('');
+    if (isLogin) {
+      const success = await handleLoginWithAxios(formData.companyPin, formData.password);
+      if (success) {
+        navigate('/dashboard');
+      }
+    } else {
+      setLoading(true);
+      try {
+        let result = await register(formData);
+        if (result.ok && result.companyPin) {
+          setCompanyPinResult(result.companyPin);
+        }
+      } catch (err) {
+        setCompanyPinResult('');
+        alert('Registration failed');
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  // Clean redirect: if company context is set, use <Navigate />
+  if (company) {
+    return <Navigate to="/dashboard" replace />;
+  }
 
   const toggleMode = () => {
     setIsLogin(!isLogin);
@@ -67,6 +107,7 @@ const LoginPage = () => {
       password: '',
       companyPin: '',
     });
+    setCompanyPinResult('');
     clearError();
   };
 
@@ -97,6 +138,17 @@ const LoginPage = () => {
           {error && (
             <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 mb-6">
               <p className="text-red-400 text-sm">{error}</p>
+            </div>
+          )}
+          {loginSuccess && (
+            <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3 mb-6">
+              <p className="text-green-400 text-sm">Login successful! Redirecting to dashboard...</p>
+            </div>
+          )}
+          {companyPinResult && !isLogin && (
+            <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3 mb-6">
+              <p className="text-green-400 text-sm">Your company PIN: <span className="font-bold">{companyPinResult}</span></p>
+              <p className="text-green-300 text-xs">Use this PIN to login to your dashboard.</p>
             </div>
           )}
 
@@ -172,9 +224,9 @@ const LoginPage = () => {
                     value={formData.companyPin}
                     onChange={handleInputChange}
                     className="w-full bg-black/20 border border-white/10 rounded-lg py-3 pl-12 pr-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-400/50"
-                    placeholder="6-digit PIN"
+                    placeholder="6-character PIN (A-Z, 0-9)"
                     maxLength="6"
-                    pattern="[0-9]{6}"
+                    pattern="[A-Za-z0-9]{6}"
                     required
                   />
                 </div>

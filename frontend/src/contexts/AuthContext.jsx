@@ -19,13 +19,24 @@ export const AuthProvider = ({ children }) => {
   // Check if user is already logged in on app start
   useEffect(() => {
     const savedCompany = localStorage.getItem('sentinel3_company');
-    if (savedCompany) {
+    if (savedCompany && savedCompany !== 'undefined' && savedCompany !== '' && savedCompany !== null) {
       try {
-        setCompany(JSON.parse(savedCompany));
+        const parsed = JSON.parse(savedCompany);
+        // Check for required fields
+        if (parsed && parsed.companyId && parsed.companyPin) {
+          setCompany(parsed);
+        } else {
+          setCompany(null);
+          localStorage.removeItem('sentinel3_company');
+        }
       } catch (err) {
         console.error('Failed to parse saved company data:', err);
+        setCompany(null);
         localStorage.removeItem('sentinel3_company');
       }
+    } else {
+      setCompany(null);
+      localStorage.removeItem('sentinel3_company');
     }
     setLoading(false);
   }, []);
@@ -34,12 +45,12 @@ export const AuthProvider = ({ children }) => {
     try {
       setError(null);
       const response = await api.loginCompany({ companyPin, password });
-      
       if (response.ok) {
         const companyData = response.company;
         setCompany(companyData);
         localStorage.setItem('sentinel3_company', JSON.stringify(companyData));
-        return { success: true };
+        // Return companyPin for consistency with registration
+        return { success: true, companyPin: companyPin };
       } else {
         throw new Error(response.error || 'Login failed');
       }

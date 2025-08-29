@@ -21,11 +21,26 @@ export const registerCompany = async (req, res) => {
 
 export const loginWithPin = async (req, res) => {
   try {
-    const { companyPin } = req.body;
-    if (!companyPin) return res.status(400).json({ error: 'companyPin required' });
+    const { companyPin, password } = req.body;
+    if (!companyPin || !password) {
+      return res.status(400).json({ error: 'companyPin and password required' });
+    }
     const company = await Company.findOne({ companyPin });
-    if (!company) return res.status(401).json({ error: 'Invalid PIN' });
-    return res.json({ ok: true, companyId: company._id, companyName: company.companyName });
+    if (!company) {
+      return res.status(401).json({ error: 'Invalid PIN' });
+    }
+    if (company.password !== password) {
+      return res.status(401).json({ error: 'Invalid password' });
+    }
+    return res.json({
+      ok: true,
+      company: {
+        companyId: company._id,
+        companyName: company.companyName,
+        companyPin: company.companyPin,
+        email: company.email
+      }
+    });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: 'Login failed' });
