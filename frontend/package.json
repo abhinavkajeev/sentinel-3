@@ -19,7 +19,7 @@
     "@testing-library/user-event": "^14.6.1",
     "axios": "^1.11.0",
     "ethers": "^6.15.0",
-    "face-api.js": "^0.20.0",
+  "face-api.js": "^0.22.2",
     "framer-motion": "^12.23.12",
     "lucide-react": "^0.542.0",
     "react": "^19.1.1",
