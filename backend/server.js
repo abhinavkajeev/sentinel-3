@@ -6,6 +6,7 @@ import mongoose from 'mongoose';
 import companyRoutes from './routes/companyRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import sessionRoutes from './routes/sessionRoutes.js';
+import ipfsRoutes from './routes/ipfsRoutes.js';
 
 dotenv.config();
 const app = express();
@@ -27,6 +28,7 @@ mongoose
 app.use('/api/company', companyRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/sessions', sessionRoutes);
+app.use('/api/ipfs', ipfsRoutes);
 
 // Health check
 app.get('/', (req, res) => {

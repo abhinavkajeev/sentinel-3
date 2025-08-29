@@ -10,6 +10,11 @@ class IPFSService {
   constructor() {
     // Initialize IPFS client using configuration
     const config = getIPFSConfig();
+    this.provider = process.env.IPFS_PROVIDER || 'infura';
+    
+    console.log(`Environment IPFS_PROVIDER: "${process.env.IPFS_PROVIDER}"`);
+    console.log(`Selected provider: "${this.provider}"`);
+    console.log(`Config:`, config);
     
     this.ipfs = create({
       host: config.host,
@@ -23,7 +28,6 @@ class IPFSService {
     });
     
     this.gateway = config.gateway;
-    this.provider = process.env.IPFS_PROVIDER || 'infura';
     
     // Initialize Pinata SDK if using Pinata
     if (this.provider === 'pinata') {
@@ -45,11 +49,8 @@ class IPFSService {
    */
   async uploadImage(imageBuffer, filename = 'image.jpg') {
     try {
-      if (this.provider === 'pinata') {
-        return await this.uploadToPinata(imageBuffer, filename);
-      } else {
-        return await this.uploadToStandardIPFS(imageBuffer, filename);
-      }
+      // For now, always use Pinata since it's configured in .env
+      return await this.uploadToPinata(imageBuffer, filename);
     } catch (error) {
       console.error('IPFS upload error:', error);
       throw new Error(`Failed to upload image to IPFS: ${error.message}`);
@@ -64,7 +65,9 @@ class IPFSService {
    */
   async uploadToPinata(imageBuffer, filename = 'image.jpg') {
     try {
-      const config = getIPFSConfig();
+      // Use hardcoded values from .env for now
+      const pinataJWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiIyN2QxYjc5OC03N2VlLTRmYmEtYjJiMS00NDZhNzJiMzZjYWYiLCJlbWFpbCI6InByaXRhbS5kZXZlbG9wZXIuMUBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicGluX3BvbGljeSI6eyJyZWdpb25zIjpbeyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJGUkExIn0seyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJOWUMxIn1dLCJ2ZXJzaW9uIjoxfSwibWZhX2VuYWJsZWQiOmZhbHNlLCJzdGF0dXMiOiJBQ1RJVkUifSwiYXV0aGVudGljYXRpb25UeXBlIjoic2NvcGVkS2V5Iiwic2NvcGVkS2V5S2V5IjoiMWQ0ODAyNjRjMGQ2YWE3YmNlNDYiLCJzY29wZWRLZXlTZWNyZXQiOiI3NmUwMjJlYTU3Mzc1MGI4ZTIxZWVhZjE5MjhiODc4NTVjNjJiYWM3ZWMyZTljNThjOTFkOGI4NzNkMGQxMGJjIiwiZXhwIjoxNzg3OTM4MDc3fQ.ApElqU2D2VNkcSbKzNaO8YlXo5kRmPSDH2oqLevE9s4";
+      const gatewayUrl = "purple-casual-quelea-374.mypinata.cloud";
       
       // Create form data for Pinata
       const formData = new FormData();
@@ -84,10 +87,10 @@ class IPFSService {
       }));
 
       // Upload to Pinata using HTTP API
-      const response = await fetch(`https://${config.host}/pinning/pinFileToIPFS`, {
+      const response = await fetch(`https://api.pinata.cloud/pinning/pinFileToIPFS`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${process.env.PINATA_JWT}`
+          'Authorization': `Bearer ${pinataJWT}`
         },
         body: formData
       });
@@ -101,7 +104,7 @@ class IPFSService {
       const hash = result.IpfsHash;
       
       // Generate Pinata gateway URL
-      const url = this.getGatewayUrl(hash);
+      const url = `https://${gatewayUrl}/ipfs/${hash}`;
       
       console.log(`Image uploaded to Pinata IPFS: ${hash}`);
       
@@ -124,15 +127,11 @@ class IPFSService {
    */
   async uploadToStandardIPFS(imageBuffer, filename = 'image.jpg') {
     try {
-      // Create form data for IPFS upload
-      const formData = new FormData();
-      formData.append('file', imageBuffer, {
-        filename,
-        contentType: 'image/jpeg'
+      // Upload buffer directly to IPFS
+      const result = await this.ipfs.add(imageBuffer, {
+        path: filename,
+        pin: true
       });
-
-      // Upload to IPFS
-      const result = await this.ipfs.add(formData);
       
       // Get the hash
       const hash = result.cid.toString();

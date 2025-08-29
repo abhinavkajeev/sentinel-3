@@ -1,0 +1,73 @@
+Environment IPFS_PROVIDER: "undefined"
+Selected provider: "infura"
+Config: {
+  host: 'ipfs.infura.io',
+  port: 5001,
+  protocol: 'https',
+  auth: undefined,
+  gateway: 'https://ipfs.io/ipfs'
+}
+IPFS Service initialized with infura at ipfs.infura.io:5001
+Blockchain Service initialized for 2147483648
+Environment IPFS_PROVIDER: "undefined"
+Selected provider: "infura"
+Config: {
+  host: 'ipfs.infura.io',
+  port: 5001,
+  protocol: 'https',
+  auth: undefined,
+  gateway: 'https://ipfs.io/ipfs'
+}
+IPFS Service initialized with infura at ipfs.infura.io:5001
+Backend server running on http://localhost:3040
+MongoDB connected
+Uploading image to IPFS...
+(node:10673) [https://github.com/node-fetch/node-fetch/issues/1167] DeprecationWarning: form-data doesn't follow the spec and requires special treatment. Use alternative package
+(Use `node --trace-deprecation ...` to show where the warning was created)
+Image uploaded to Pinata IPFS: QmSfXsxbpueoYmTJRjEtP68v6ZFXbZEiDpJMZADMfTMqPf
+Image uploaded successfully: QmSfXsxbpueoYmTJRjEtP68v6ZFXbZEiDpJMZADMfTMqPf
+Uploading image to IPFS...
+Image uploaded to Pinata IPFS: QmbhtgmmkwQAAu1a1Kpa85YtijCHMgmJ9nB4uD3RvTBSEM
+Image uploaded successfully: QmbhtgmmkwQAAu1a1Kpa85YtijCHMgmJ9nB4uD3RvTBSEM
+Uploading image to IPFS...
+Image uploaded to Pinata IPFS: QmcQm423Bxc8rqpB7x42ZGo1Zb8sKcAboQyDFKfk2Hgv8B
+Image uploaded successfully: QmcQm423Bxc8rqpB7x42ZGo1Zb8sKcAboQyDFKfk2Hgv8B
+Uploading image to IPFS...
+Pinata upload error: FetchError: request to https://api.pinata.cloud/pinning/pinFileToIPFS failed, reason: read ECONNRESET
+    at ClientRequest.<anonymous> (file:///Users/abhinavka/sentinel-3/sentinel-3/backend/node_modules/node-fetch/src/index.js:108:11)
+    at ClientRequest.emit (node:events:519:35)
+    at emitErrorEvent (node:_http_client:104:11)
+    at TLSSocket.socketErrorListener (node:_http_client:518:5)
+    at TLSSocket.emit (node:events:507:28)
+    at emitErrorNT (node:internal/streams/destroy:170:8)
+    at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  type: 'system',
+  errno: 'ECONNRESET',
+  code: 'ECONNRESET',
+  erroredSysCall: 'read'
+}
+IPFS upload error: Error: Failed to upload to Pinata: request to https://api.pinata.cloud/pinning/pinFileToIPFS failed, reason: read ECONNRESET
+    at IPFSService.uploadToPinata (file:///Users/abhinavka/sentinel-3/sentinel-3/backend/services/ipfsService.js:118:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async IPFSService.uploadImage (file:///Users/abhinavka/sentinel-3/sentinel-3/backend/services/ipfsService.js:53:14)
+    at async IPFSService.uploadBase64Image (file:///Users/abhinavka/sentinel-3/sentinel-3/backend/services/ipfsService.js:169:14)
+    at async file:///Users/abhinavka/sentinel-3/sentinel-3/backend/routes/ipfsRoutes.js:22:20
+Base64 upload error: Error: Failed to upload image to IPFS: Failed to upload to Pinata: request to https://api.pinata.cloud/pinning/pinFileToIPFS failed, reason: read ECONNRESET
+    at IPFSService.uploadImage (file:///Users/abhinavka/sentinel-3/sentinel-3/backend/services/ipfsService.js:56:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async IPFSService.uploadBase64Image (file:///Users/abhinavka/sentinel-3/sentinel-3/backend/services/ipfsService.js:169:14)
+    at async file:///Users/abhinavka/sentinel-3/sentinel-3/backend/routes/ipfsRoutes.js:22:20
+IPFS upload error: Error: Failed to upload base64 image: Failed to upload image to IPFS: Failed to upload to Pinata: request to https://api.pinata.cloud/pinning/pinFileToIPFS failed, reason: read ECONNRESET
+    at IPFSService.uploadBase64Image (file:///Users/abhinavka/sentinel-3/sentinel-3/backend/services/ipfsService.js:172:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async file:///Users/abhinavka/sentinel-3/sentinel-3/backend/routes/ipfsRoutes.js:22:20
+Uploading image to IPFS...
+Image uploaded to Pinata IPFS: QmSR1jbX9xzyaKRh9jHLfpx15UpZiaxWj48GULhxVUTNhD
+Image uploaded successfully: QmSR1jbX9xzyaKRh9jHLfpx15UpZiaxWj48GULhxVUTNhD
+Uploading image to IPFS...
+Image uploaded to Pinata IPFS: QmPKW9tQwzHc7B7XrjrMK2cXCaL3yHfpowH3HGNLFqZo2Z
+Image uploaded successfully: QmPKW9tQwzHc7B7XrjrMK2cXCaL3yHfpowH3HGNLFqZo2Z
+Uploading image to IPFS...
+Image uploaded to Pinata IPFS: QmV7BZvbJGcP226NoCYSAMa5ihWVT852ALmxgRqQ4mdaXv
+Image uploaded successfully: QmV7BZvbJGcP226NoCYSAMa5ihWVT852ALmxgRqQ4mdaXv

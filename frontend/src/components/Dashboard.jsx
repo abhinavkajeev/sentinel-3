@@ -257,8 +257,21 @@ const Dashboard = () => {
                   <div className="col-span-4 flex items-center space-x-3">
                     <Fingerprint className="text-gray-500" size={18}/>
                     <span className="font-mono text-sm text-gray-300">{event.id}</span>
+                    {/* Show event image if available */}
+                    {event.ipfsUrl && (
+                      <img src={event.ipfsUrl} alt="Event" className="ml-2 w-12 h-12 rounded shadow border border-gray-700 object-cover" />
+                    )}
                   </div>
-                  <div className="col-span-3 text-sm text-gray-400 flex items-center">{event.timestamp}</div>
+                  <div className="col-span-3 text-sm text-gray-400 flex flex-col justify-center">
+                    <span>{event.timestamp}</span>
+                    {/* Show blockchain info if available */}
+                    {event.txHash && (
+                      <span className="text-green-400 text-xs font-mono">TX: {event.txHash}</span>
+                    )}
+                    {event.eventId && (
+                      <span className="text-purple-400 text-xs font-mono">EventID: {event.eventId}</span>
+                    )}
+                  </div>
                   <div className="col-span-1 flex items-center">
                     {event.eventType === 'Entry' ? <LogIn className="text-green-400" size={18} /> : event.eventType === 'Exit' ? <LogOut className="text-red-400" size={18} /> : <AlertTriangle className="text-yellow-400" size={18}/>}
                   </div>

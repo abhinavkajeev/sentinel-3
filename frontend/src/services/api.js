@@ -1,32 +1,21 @@
+import axios from 'axios';
 const API_BASE_URL = 'http://localhost:3040/api';
 
 class ApiService {
   constructor() {
     this.baseURL = API_BASE_URL;
+    this.client = axios.create({ baseURL: API_BASE_URL });
   }
 
-  // Generic request method
+  // Generic request method using axios
   async request(endpoint, options = {}) {
-    const url = `${this.baseURL}${endpoint}`;
-    const config = {
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
-      ...options,
-    };
-
     try {
-      const response = await fetch(url, config);
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.error || `HTTP error! status: ${response.status}`);
-      }
-      
-      return data;
+      const response = await this.client.request({ url: endpoint, ...options });
+      return response.data;
     } catch (error) {
-      console.error('API request failed:', error);
+      if (error.response && error.response.data) {
+        throw new Error(error.response.data.error || error.message);
+      }
       throw error;
     }
   }
@@ -46,27 +35,46 @@ class ApiService {
     });
   }
 
-  // Session management
+
+  // IPFS direct upload
+  async uploadToIPFS(imageData) {
+    // POST /ipfs/upload
+    return this.request('/ipfs/upload', {
+      method: 'POST',
+      data: {
+        imageBase64: imageData,
+        filename: `camera-${Date.now()}.jpg`
+      }
+    });
+  }
+
+  // Session management (image recognition endpoints)
   async logEntry(sessionData) {
+    // POST /sessions/entry
     return this.request('/sessions/entry', {
       method: 'POST',
-      body: JSON.stringify(sessionData),
+      data: sessionData
     });
   }
 
   async logExit(sessionData) {
+    // POST /sessions/exit
     return this.request('/sessions/exit', {
       method: 'POST',
-      body: JSON.stringify(sessionData),
+      data: sessionData
     });
   }
 
   async getRecentSessions(companyPin, limit = 50) {
-    return this.request(`/sessions/recent?companyPin=${companyPin}&limit=${limit}`);
+    // GET /sessions/recent
+    return this.request(`/sessions/recent?companyPin=${companyPin}&limit=${limit}`, {
+      method: 'GET'
+    });
   }
 
   async getImage(hash) {
-    return `${this.baseURL}/sessions/image/${hash}`;
+    // GET /sessions/image/:hash
+    return this.client.get(`/sessions/image/${hash}`, { responseType: 'blob' });
   }
 
   // Admin functions
