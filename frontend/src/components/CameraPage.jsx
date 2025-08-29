@@ -66,9 +66,14 @@ const CameraPage = () => {
   useEffect(() => {
     const loadModelsAndStart = async () => {
       try {
-        // Skip model loading for now - run in demo mode
-        console.log('Running in demo mode - face detection models not available');
-        setError('Running in demo mode - face detection models not available');
+        // Load face detection models from public/models folder
+        const MODEL_URL = '/models';
+        await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
+        await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
+        await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
+        
+        console.log('Face detection models loaded successfully');
+        setError('Real-time face detection ready');
         setModelsLoaded(true);
         
         // Start camera regardless of model loading status
@@ -147,27 +152,8 @@ const CameraPage = () => {
               });
               console.log(`${eventType} logged:`, response);
             } catch (err) {
-              console.warn('Backend API not available, simulating response:', err);
-              // Simulate successful response for demo
-              const simulatedResponse = {
-                sessionId: `DEMO-${Date.now()}`,
-                photoHash: `demo-hash-${Math.random().toString(36).substr(2, 9)}`,
-                ipfsHash: `ipfs://demo-${Math.random().toString(36).substr(2, 9)}`,
-                onchain: false
-              };
-              timestamp = new Date().toLocaleTimeString();
-              setCurrentHash(simulatedResponse.photoHash);
-              setLastDetection(timestamp);
-              setDetectionCount(prev => prev + 1);
-              setLastEvent({
-                type: eventType,
-                sessionId: simulatedResponse.sessionId,
-                photoHash: simulatedResponse.photoHash,
-                ipfsHash: simulatedResponse.ipfsHash,
-                timestamp,
-                blockchain: simulatedResponse.onchain
-              });
-              console.log(`${eventType} simulated:`, simulatedResponse);
+              console.error('API call failed:', err);
+              setError('Failed to log event: ' + (err?.message || err));
             }
           } catch (error) {
             console.error('Failed to process detection:', error);
@@ -194,18 +180,33 @@ const CameraPage = () => {
         
         setDetecting(true);
         
-        // Simulate face detection for demo purposes
-        console.log('Simulating face detection for demo');
-        const simulatedDetection = { 
-          descriptor: Array.from({ length: 128 }, () => Math.random() * 2 - 1) 
-        };
-        
-        setDetecting(false);
-        
-        // Simulate detection delay
-        setTimeout(async () => {
-          await captureAndUpload(simulatedDetection.descriptor);
-        }, 1000);
+        // Real-time face detection using face-api.js
+        try {
+          const video = videoRef.current;
+          if (video && video.readyState === video.HAVE_ENOUGH_DATA) {
+            // Use face-api.js for real face detection
+            const detections = await faceapi.detectAllFaces(
+              video,
+              new faceapi.TinyFaceDetectorOptions()
+            ).withFaceLandmarks().withFaceDescriptors();
+            
+            if (detections && detections.length > 0) {
+              console.log('Face detected in real-time:', detections.length, 'faces');
+              const face = detections[0];
+              setDetecting(false);
+              await captureAndUpload(face.descriptor);
+            } else {
+              console.log('No face detected');
+              setDetecting(false);
+            }
+          } else {
+            console.log('Video not ready for analysis');
+            setDetecting(false);
+          }
+        } catch (error) {
+          console.error('Face detection error:', error);
+          setDetecting(false);
+        }
       }
     };
     if (streaming) {
@@ -213,6 +214,53 @@ const CameraPage = () => {
     }
     return () => clearInterval(interval);
   }, [streaming, uploadingToIPFS, modelsLoaded]);
+
+  // Helper function to generate face descriptor from detected face
+  const generateFaceDescriptor = (face, canvasWidth, canvasHeight) => {
+    const { boundingBox } = face;
+    const centerX = boundingBox.x + boundingBox.width / 2;
+    const centerY = boundingBox.y + boundingBox.height / 2;
+    const size = boundingBox.width * boundingBox.height;
+    
+    // Create a descriptor based on face position and size
+    const descriptor = Array.from({ length: 128 }, (_, i) => {
+      if (i < 32) return (centerX / canvasWidth) * 2 - 1;
+      if (i < 64) return (centerY / canvasHeight) * 2 - 1;
+      if (i < 96) return (size / (canvasWidth * canvasHeight)) * 2 - 1;
+      return Math.random() * 2 - 1;
+    });
+    
+    return descriptor;
+  };
+
+  // Helper function to generate random face descriptor
+  const generateRandomFaceDescriptor = () => {
+    return Array.from({ length: 128 }, () => Math.random() * 2 - 1);
+  };
+
+  // Helper function to analyze frame for face-like patterns
+  const analyzeFrameForFace = (imageData) => {
+    const { data, width, height } = imageData;
+    let skinTonePixels = 0;
+    let totalPixels = width * height;
+    
+    // Simple skin tone detection
+    for (let i = 0; i < data.length; i += 4) {
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
+      
+      // Basic skin tone detection (simplified)
+      if (r > 95 && g > 40 && b > 20 && 
+          Math.max(r, g, b) - Math.min(r, g, b) > 15 &&
+          Math.abs(r - g) > 15 && r > g && r > b) {
+        skinTonePixels++;
+      }
+    }
+    
+    const skinToneRatio = skinTonePixels / totalPixels;
+    return skinToneRatio > 0.1; // If more than 10% of pixels are skin tone
+  };
 
   return (
     <div className="min-h-screen bg-black text-white relative overflow-hidden">
