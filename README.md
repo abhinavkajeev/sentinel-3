@@ -238,36 +238,36 @@ PINATA_SECRET_KEY=your_pinata_secret_key
 
 #### 🏠 Landing Page Experience
 <div align="center">
-  <img src="./sentinel-3/frontend/public/img1.png" alt="Landing Page Experience" width="600" style="border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+  <img src="./frontend/public/img1.png" alt="Landing Page Experience" width="600" style="border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   <p><em>Clean and intuitive landing page design</em></p>
 </div>
 
 #### 📊 Dashboard Analytics
 <div align="center">
-  <img src="./sentinel-3/frontend/public/img4.png" alt="Dashboard Analytics" width="600" style="border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+  <img src="./frontend/public/img4.png" alt="Dashboard Analytics" width="600" style="border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   <p><em>Real-time monitoring and security analytics</em></p>
 </div>
 
 #### 🔗 Wallet Integration
 <div align="center">
-  <img src="./sentinel-3/frontend/public/img5.png" alt="Wallet Integration" width="600" style="border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+  <img src="./frontend/public/img5.png" alt="Wallet Integration" width="600" style="border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   <p><em>Secure blockchain wallet connection</em></p>
 </div>
 
 #### 📸 Camera Detection System
 <div align="center">
-  <img src="./sentinel-3/frontend/public/img6.png" alt="Camera Detection" width="600" style="border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+  <img src="./frontend/public/img6.png" alt="Camera Detection" width="600" style="border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   <p><em>Live face detection and event capture</em></p>
 </div>
 
 #### 🌐 IPFS Storage Management
 <div align="center">
-  <img src="./sentinel-3/frontend/public/img7.png" alt="IPFS Storage" width="600" style="border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+  <img src="./frontend/public/img7.png" alt="IPFS Storage" width="600" style="border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   <p><em>Decentralized image storage and verification</em></p>
 </div> 
 
 <div align="center">
-  <img src="./sentinel-3/frontend/public/img9.jpeg" alt="IPFS Storage" width="600" style="border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+  <img src="./frontend/public/img9.jpeg" alt="IPFS Storage" width="600" style="border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   <p><em>Decentralized image storage and verification</em></p>storage
   </div>
 - 🔗 IPFS hash generation
