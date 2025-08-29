@@ -1,0 +1,18 @@
+---
+id: 0
+name: Testnet deployment
+network: testnet
+stacks-node: "https://api.testnet.hiro.so"
+bitcoin-node: "http://blockstack:blockstacksystem@bitcoind.testnet.stacks.co:18332"
+plan:
+  batches:
+    - id: 0
+      transactions:
+        - contract-publish:
+            contract-name: access-log
+            expected-sender: ST1K0VSS7T35EK2R2GWQD5C1JFKKRCJ84FS910WYD
+            cost: 27010
+            path: "contracts\\access-log.clar"
+            anchor-block-only: true
+            clarity-version: 3
+      epoch: "3.2"
